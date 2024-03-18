@@ -19,15 +19,14 @@ def check_or_create_file(file_path, data):
             
 class telegram:
     def __init__(self, Name, id, hash, id_chat):
-        self.id_chat = id_chat
         self.app = Client(name=Name, api_id=id, api_hash=hash)
 
-    def messages_group(self):
+    def messages_group(self, id_chat):
         @self.app.on_message()
         async def serch(client, message):
             print(message.date, message.chat.id, message.chat.first_name)
             try:
-                await message.forward(self.id_chat)
+                await message.forward(id_chat)
             except Exception as e:
                 traceback_str = str(traceback.format_exc())
                 with open('ErrorSaveMassage', 'a', encoding='UTF-8') as f:
@@ -42,6 +41,7 @@ class telegram:
             check_or_create_directory(str(message.chat.id))
             check_or_create_file('text.json', str(message).replace('\n', ''))
             print(message.date, message.chat.id, message.chat.first_name)
+            os.chdir('../')
 
         self.app.run()
 
