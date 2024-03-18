@@ -14,14 +14,14 @@ significantly improves the efficiency of data management in Telegram and provide
 messages.
 
 ## To work with the project
+Есть два способа сохранения сообщений `tsm.messages_group(id_group)` сохраняет в группу указаною, или `tsm.messages_file()` сохраняет на ваше устройство.
 ```python
 import telegram_save_message as tsm
 
 tsm = tsm.telegram(
-	Name = 'Your name',
+  Name = 'Your name',
   id = 'Your account ID',
-  hash = 'Hash of your account',
-  id_chat = 'Group ID'
+  hash = 'Hash of your account'
 )
-tsm.start()
+tsm.messages_group(id_chat = 'Group ID')
 ```
