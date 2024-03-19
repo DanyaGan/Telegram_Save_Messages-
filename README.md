@@ -14,7 +14,7 @@ significantly improves the efficiency of data management in Telegram and provide
 messages.
 
 ## To work with the project
-Есть два способа сохранения сообщений `tsm.messages_group(id_group)` сохраняет в группу указаною, или `tsm.messages_file()` сохраняет на ваше устройство.
+There are two ways to save messages `tsm.messages_group(id_group)` saves to the specified group, or `tsm.messages_file()` saves to your device.
 ```python
 import telegram_save_message as tsm
 
@@ -25,3 +25,6 @@ tsm = tsm.telegram(
 )
 tsm.messages_group(id_chat = 'Group ID')
 ```
+
+You can also add a list of chat IDs to ignore messages or take into account the list of chats to save. Need to be added to `tsm.telegram()` this parameter `acknowledge=[]` or `consider=[]`.
+
