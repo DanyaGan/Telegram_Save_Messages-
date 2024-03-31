@@ -45,65 +45,41 @@ class telegram:
             self.app.run()  
 
     def messages_file(self):
-        async def save_file(message):
+        def save_file(message, file_name=None, type_file=None, file=None):
             check_or_create_directory(str(message.chat.id))
             check_or_create_file('text.json', str(message).replace('\n', ''))
 
+            if file_name:
+                with open(f'{file_name}.{type_file}', 'w') as f:
+                    f.write(file)
+
+            os.chdir('../')
         
         if self.acknowledge or self.consider:
             check_or_create_directory('users')
             @self.app.on_message()
             async def serch(client, message):
-                if message.chat.id in self.consider:
-                    save_file( message)
-
-
-                    print(message)
+                if message.chat.id in self.consider or message.chat.id not in self.acknowledge:
+                    print('save')
                     if message.photo:
                         file = await self.app.download_media(message.photo.file_id)
                         file_name = str(message.photo.date).replace(':', '-')
-                        with open(f'{message.chat.id}/{file_name}.png', 'w') as f:
-                            f.write(file)
+                        save_file(message, file_name, 'png', file)
 
                     elif message.video:
                         file = await self.app.download_media(message.video.file_id)
                         file_name = str(message.video.date).replace(':', '-')
-                        with open(f'{message.chat.id}/{file_name}.mp4', 'w') as f:
-                            f.write(file)
+                        save_file(message, file_name, 'mp4', file)
 
                     elif message.voice:
                         file = await self.app.download_media(message.voice.file_id)
                         file_name = str(message.voice.date).replace(':', '-')
-                        with open(f'{message.chat.id}/{file_name}.mp3', 'w') as f:
-                            f.write(file)
+                        save_file(message, file_name, 'mp3', file)
+                    
+                    else:
+                        save_file(message)
 
                     print(message.date, message.chat.id, message.chat.first_name)
-                    os.chdir('../')
-                
-                if message.chat.id not in self.acknowledge:
-                    save_file(message)
-
-                    print(message)
-                    if message.photo:
-                        file = await self.app.download_media(message.photo.file_id)
-                        file_name = str(message.photo.date).replace(':', '-')
-                        with open(f'{message.chat.id}/{file_name}.png', 'w') as f:
-                            f.write(file)
-
-                    elif message.video:
-                        file = await self.app.download_media(message.video.file_id)
-                        file_name = str(message.video.date).replace(':', '-')
-                        with open(f'{message.chat.id}/{file_name}.mp4', 'w') as f:
-                            f.write(file)
-
-                    elif message.voice:
-                        file = await self.app.download_media(message.voice.file_id)
-                        file_name = str(message.voice.date).replace(':', '-')
-                        with open(f'{message.chat.id}/{file_name}.mp3', 'w') as f:
-                            f.write(file)
-
-                    print(message.date, message.chat.id, message.chat.first_name)
-                    os.chdir('../')
                     
             self.app.run()
 
