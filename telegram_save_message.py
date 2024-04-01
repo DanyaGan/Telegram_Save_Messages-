@@ -15,7 +15,7 @@ def check_or_create_file(file_path, data):
         with open(file_path, 'w'): pass
     else:
         with open(file_path, 'a', encoding='UTF-8') as f:
-            f.write(data)
+            f.write(f'{data}\n')
             
 class telegram:
     def __init__(self, Name, id, hash, acknowledge=[], consider=[]):
@@ -23,7 +23,7 @@ class telegram:
         self.acknowledge = acknowledge
         self.consider = consider
 
-    def messages_group(self, id_chat):
+    def messages_group(self, id_chat, photo=True, video=True, voice=True):
         async def forward(message):
             print(message.date, message.chat.id, message.chat.first_name)
             try:
@@ -36,16 +36,21 @@ class telegram:
         if self.acknowledge or self.consider:
             @self.app.on_message()
             async def serch(client, message):
-                if message.chat.id in self.consider:
-                    forward(message)
-
-                elif message.chat.id not in self.acknowledge:
-                    forward(message)
+                if message.chat.id in self.consider or message.chat.id not in self.acknowledge:
+                    if message.photo and photo:
+                        forward(message)
+                    elif message.video and video:
+                        forward(message)
+                    elif message.voice and voice:
+                        forward(message)
+                    elif message.text:
+                        forward(message)
 
             self.app.run()  
 
-    def messages_file(self):
+    def messages_file(self, photo=True, video=True, voice=True):
         def save_file(message, file_name=None, type_file=None, file=None):
+            print(message.date, message.chat.id, message.chat.first_name)
             check_or_create_directory(str(message.chat.id))
             check_or_create_file('text.json', str(message).replace('\n', ''))
 
@@ -60,27 +65,23 @@ class telegram:
             @self.app.on_message()
             async def serch(client, message):
                 if message.chat.id in self.consider or message.chat.id not in self.acknowledge:
-                    print('save')
-                    if message.photo:
+                    if message.photo and photo:
                         file = await self.app.download_media(message.photo.file_id)
                         file_name = str(message.photo.date).replace(':', '-')
                         save_file(message, file_name, 'png', file)
 
-                    elif message.video:
+                    elif message.video and video:
                         file = await self.app.download_media(message.video.file_id)
                         file_name = str(message.video.date).replace(':', '-')
                         save_file(message, file_name, 'mp4', file)
 
-                    elif message.voice:
+                    elif message.voice and voice:
                         file = await self.app.download_media(message.voice.file_id)
                         file_name = str(message.voice.date).replace(':', '-')
                         save_file(message, file_name, 'mp3', file)
                     
-                    else:
-                        save_file(message)
-
-                    print(message.date, message.chat.id, message.chat.first_name)
-                    
+                    elif message.text:
+                        save_file(message)      
             self.app.run()
 
     
