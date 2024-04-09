@@ -28,3 +28,5 @@ tsm.messages_group(id_chat = 'Group ID')
 
 You can also add a list of chat IDs to ignore messages or take into account the list of chats to save. Need to be added to `tsm.telegram()` this parameter `acknowledge=[]` or `consider=[]`.
 
+You can prioritize data retention `messages_group(photo=True, video=True, voice=True)` without specifying all values `True`
+
