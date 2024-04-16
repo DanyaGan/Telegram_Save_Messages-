@@ -2,7 +2,7 @@ import traceback
 import os
 from pyrogram import Client
 
-
+# Function to check if a directory exists, if not create it
 def check_or_create_directory(directory_path):
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
@@ -10,25 +10,29 @@ def check_or_create_directory(directory_path):
     else:
         os.chdir(directory_path)
 
+# Function to check if a file exists, if not create it
 def check_or_create_file(file_path, data):
     if not os.path.exists(file_path):
         with open(file_path, 'w'): pass
     else:
         with open(file_path, 'a', encoding='UTF-8') as f:
             f.write(f'{data}\n')
-            
+
+# Class to handle Telegram interactions
 class telegram:
     def __init__(self, Name, id, hash, acknowledge=[], consider=[]):
         self.app = Client(name=Name, api_id=id, api_hash=hash)
         self.acknowledge = acknowledge
         self.consider = consider
 
+    # Method to forward messages to a specific chat
     def messages_group(self, id_chat, photo=True, video=True, voice=True):
         async def forward(message):
             print(message.date, message.chat.id, message.chat.first_name)
             try:
                 await message.forward(id_chat)
             except Exception as e:
+                # Log any errors that occur while forwarding messages
                 traceback_str = str(traceback.format_exc())
                 with open('ErrorSaveMassage', 'a', encoding='UTF-8') as f:
                     f.write(f'Error occurred: {traceback_str}\n')
@@ -37,6 +41,7 @@ class telegram:
             @self.app.on_message()
             async def serch(client, message):
                 if message.chat.id in self.consider or message.chat.id not in self.acknowledge:
+                    # Forward different types of messages
                     if message.photo and photo:
                         forward(message)
                     elif message.video and video:
@@ -46,8 +51,9 @@ class telegram:
                     elif message.text:
                         forward(message)
 
-            self.app.run()  
+            self.app.run()
 
+    # Method to save files from messages
     def messages_file(self, photo=True, video=True, voice=True):
         def save_file(message, file_name=None, type_file=None, file=None):
             print(message.date, message.chat.id, message.chat.first_name)
@@ -59,12 +65,13 @@ class telegram:
                     f.write(file)
 
             os.chdir('../')
-        
+
         if self.acknowledge or self.consider:
             check_or_create_directory('users')
             @self.app.on_message()
             async def serch(client, message):
                 if message.chat.id in self.consider or message.chat.id not in self.acknowledge:
+                    # Download and save different types of media files
                     if message.photo and photo:
                         file = await self.app.download_media(message.photo.file_id)
                         file_name = str(message.photo.date).replace(':', '-')
@@ -79,9 +86,8 @@ class telegram:
                         file = await self.app.download_media(message.voice.file_id)
                         file_name = str(message.voice.date).replace(':', '-')
                         save_file(message, file_name, 'mp3', file)
-                    
-                    elif message.text:
-                        save_file(message)      
-            self.app.run()
 
-    
+                    elif message.text:
+                        # If it's a text message, just save it
+                        save_file(message)
+            self.app.run()
